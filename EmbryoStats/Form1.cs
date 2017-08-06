@@ -16,7 +16,7 @@ namespace EmbryoStats
     {
 
         ArrayList images;
-        ProgressBar pb;
+        ProgressBar progbar;
 
         public Form1()
         {
@@ -58,25 +58,38 @@ namespace EmbryoStats
         public void startThread()
         {
             Algorithim algo = new Algorithim(images, progressBarProg, resultCallback);
-            initProgressBar(algo.getSize());
+            InitProgressBar(algo.getSize());
             algo.start();
         }
 
-        public void initProgressBar(long size) {
-            Form2 form = new Form2();
-            pb = form.getProgressBar();
-            pb.Maximum = (int)size;
-            pb.Value = 0;
-            form.Show();
+        public void InitProgressBar(long size)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<long>(InitProgressBar), new object[] { size });
+                return;
+            }
+            progbar.Visible = true;
+            progbar.Maximum = (int)size;
         }
 
         public void progressBarProg(int progress)
         {
-            pb.Value = progress;
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<int>(progressBarProg), new object[] { progress });
+                return;
+            }
+            progbar.Value = progress;
         }
 
         public void resultCallback(int res) {
             MessageBox.Show("Done! result: " + res);
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            progbar = progressBar2;
         }
     }
 }
